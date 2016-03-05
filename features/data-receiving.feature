@@ -4,8 +4,19 @@ Feature: Sensors send data
   one sensor fires first, followed by the other, we know that the wheel is turning in a certain direction. When the
   first sensor fires and then fires again, we know that the wheel is stationary.
 
+  Background:
+    Given a sensor manager
+
   Scenario: turning
-    Given two sensors
+    Given 1 sensors
     And sensor 1 is low
     When sensor 1 goes high
     Then the sensor manager returns 1 transition
+
+  Scenario: transition of two sensors means the wheel is turning
+    Given 2 sensors
+    And sensor 1 is low
+    And sensor 2 is low
+    When sensor 1 goes high
+    And sensor 2 goes high
+    Then the wheel has turned 45 degrees

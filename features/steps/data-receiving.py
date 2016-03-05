@@ -1,4 +1,4 @@
-import time
+import time, math
 from multiprocessing import Manager
 
 from behave import *
@@ -8,7 +8,7 @@ from hamster.sensor import Sensor, SensorManager
 use_step_matcher("parse")
 
 
-@given("two sensors")
+@given("a sensor manager")
 def step_impl(context):
     """
     :type context: behave.runner.Context
@@ -16,10 +16,17 @@ def step_impl(context):
     manager = Manager()
     queue = manager.Queue()
     context.queue = queue
+    context.sensor_manager = SensorManager(context.queue)
+
+
+@given("{amount} sensors")
+def step_impl(context, amount):
+    """
+    :type context: behave.runner.Context
+    """
     context.sensors = []
-    context.sensors.append(Sensor(sensor_id=0, queue=queue))
-    context.sensors.append(Sensor(sensor_id=1, queue=queue))
-    context.sensor_manager = SensorManager(queue)
+    for i in range(int(amount)):
+        context.sensors.append(Sensor(sensor_id=i, queue=context.queue))
 
 
 @given("sensor {number} is {state}")
@@ -53,3 +60,11 @@ def step_impl(context, amount):
     events = context.sensor_manager.get_events()
     event_list = list(events)
     assert len(event_list) == int(amount)
+
+
+@then("the wheel has turned {degrees} degrees")
+def step_impl(context, degrees):
+    """
+    :type context: behave.runner.Context
+    """
+    assert context.sensor_manager.get_rotation() == 0.25 * math.pi

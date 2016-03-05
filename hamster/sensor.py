@@ -43,3 +43,6 @@ class SensorManager(object):
                 yield event
             else:
                 raise StopIteration
+
+    def rotation(self):
+        pass
